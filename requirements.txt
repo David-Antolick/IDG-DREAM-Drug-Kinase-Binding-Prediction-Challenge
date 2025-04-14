@@ -1,0 +1,15 @@
+# Installations from professor
+scikit-learn==1.6.1
+xgboost==3.0.0
+torch==2.6.0
+lightning==2.5.1
+jax==0.5.3
+numpy==1.26.4
+scipy==1.15.1
+pandas==2.2.3
+rdkit==2024.03.5
+biopython==1.85
+deepchem==2.5.0
+mol2vec==0.2.2
+sgt==2.0.3
+cloudpickle==3.1.1

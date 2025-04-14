@@ -1,0 +1,84 @@
+============================
+IDG-DREAM CHALLENGE CHECKLIST
+============================
+
+GENERAL SETUP
+_____________
+
+[X] Create GitHub repo for this project
+[ ] Initialize Docker project (Dockerfile + requirements.txt)
+[ ] Confirm Docker container runs with base dependencies
+
+
+DATA DOWNLOADS
+______________
+
+[ ] Download `chembl_activities.txt.gz` (provided by instructor)
+[ ] Download `chembl_33_chemreps.txt.gz`
+[ ] Download `test1.txt`, `test2.txt`, `indep.txt`
+[ ] Download `test1_labels.txt`, `test2_labels.txt` (for validation only!)
+[ ] Download `test_kinase_seqs.txt`
+[ ] Download `kinase_seqs.txt`
+[ ] Download UniProt <-> ChEMBL mapping file (or extract from paper/links)
+
+
+DATA PREPARATION
+________________
+
+[ ] Parse and extract relevant (SMILES, target, pChEMBL) from `chembl_activities.txt.gz`
+[ ] Filter for kinase targets only
+[ ] Map ChEMBL target -> UniProt using mapping file
+[ ] Join with `chembl_33_chemreps.txt.gz` to get SMILES
+[ ] Prepare training dataset: (SMILES, UniProt, pAffinity)
+[ ] Save as clean CSV or .npy for model training
+[ ] Prepare validation datasets from test1/test2 files for evaluation only
+
+
+MODEL DEVELOPMENT
+_________________
+
+[ ] Decide on compound featurization (e.g. MorganFP, Mol2Vec, RDKit, etc.)
+[ ] Decide on protein featurization (e.g. sequence embeddings, TAPE, etc.)
+[ ] Implement basic model architecture (MLP, GNN, or hybrid)
+[ ] Train initial model on training dataset
+[ ] Evaluate on `test1_labels.txt` and `test2_labels.txt` for checkpoint
+
+
+CHECKPOINT SUBMISSION
+_____________________
+
+[ ] Package model with inference script that can:
+      - Load model
+      - Accept test file (SMILES + UniProt)
+      - Output predictions to file with same structure + prediction column
+[ ] Ensure model outperforms baseline (mean predictor)
+[ ] Submit working code for checkpoint to avoid penalty
+
+
+FINAL MODEL + WRITEUP
+_____________________
+
+[ ] Tune model and features using validation sets
+[ ] Test prediction speed on full `test1.txt`, `test2.txt`, and `indep.txt`
+[ ] Confirm model inference completes in < 20 minutes
+[ ] Save trained model using `cloudpickle`
+[ ] Host final `model.pkl` on OneDrive or GitHub LFS
+[ ] Ensure your prediction script downloads and loads model correctly
+
+[ ] Write final report (0.5–2 pages)
+      - Description of model and featurization
+      - Summary of performance (with numbers)
+      - What worked, what didn’t
+      - Include any useful code snippets or figures
+[ ] Export writeup as PDF
+[ ] Email PDF to dkoes and mchikina before April 30, 11:59pm
+
+
+OPTIONAL ENHANCEMENTS
+_____________________
+
+[ ] Try different molecular embeddings (Mol2Vec, GIN, etc.)
+[ ] Try different protein embeddings (ESM, ProtBert, etc.)
+[ ] Build an ensemble model
+[ ] Add ROC AUC calculation for `indep.txt`
+[ ] Aim to beat competition S = 0.56/0.53 for extra credit
