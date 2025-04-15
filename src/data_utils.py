@@ -1,12 +1,11 @@
 import pandas as pd
 import os
 
-# === FILE LOCATIONS ===
 raw_dir = "data/raw"
 processed_dir = "data/processed"
 
 act_path = os.path.join(raw_dir, "chembl_activities.txt.gz")
-map_path = os.path.join(raw_dir, "uniprot_chembl_mapping.txt")  # format: uniprot<TAB>chembl_target
+map_path = os.path.join(raw_dir, "uniprot_chembl_mapping.txt")
 
 out_path = os.path.join(processed_dir, "train_dataset.csv")
 
@@ -42,11 +41,7 @@ def main():
 
     # Map ChEMBL target to UniProt
     df["uniprot"] = df["target"].map(mapping)
-
-    # Drop rows with missing mappings
     df = df.dropna(subset=["uniprot"])
-
-    # Final cleanup
     df = df[["smiles", "uniprot", "pchembl"]].drop_duplicates()
 
     df.to_csv(out_path, index=False)
