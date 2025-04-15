@@ -2,14 +2,8 @@
 __pycache__/
 *.py[cod]
 *.so
+*.ttx
 
-# Virtual environments
-.venv/
-env/
-venv/
-
-# Jupyter notebooks
-.ipynb_checkpoints/
 
 # Data / models
 *.pkl
