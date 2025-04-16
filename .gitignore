@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *.so
 *.ttx
+test.py
 
 
 # Data / models
