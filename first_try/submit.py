@@ -8,7 +8,7 @@ import time
 
 start_time = time.time()
 
-# === Download Helper ===
+#  Download Helper 
 def get_sharepoint(url, fname):
     '''Fetch a world-readable SharePoint file shared via URL'''
     s = requests.Session()
@@ -30,16 +30,16 @@ def get_sharepoint(url, fname):
             fd.write(chunk)
     return True
 
-# === Download all files ===
-get_sharepoint("https://pitt-my.sharepoint.com/:u:/g/personal/daa248_pitt_edu/EbHdlSIDzHFGl5lw7g2KPnoBS1NBezDU2d3-5C0u8vm_cw?e=4WSHKH", "model.pkl")
+#  Download all files 
+get_sharepoint("https://pitt-my.sharepoint.com/:u:/g/personal/daa248_pitt_edu/EXax2uFOUN9Cqdc1RLIGLUMBr4M_RsN5IaAJZLC0KBmt9w?e=2O9nVl", "model.pkl")
 get_sharepoint("https://pitt-my.sharepoint.com/:t:/g/personal/daa248_pitt_edu/EdUlcAZ2gdFGnrqTCCUrQY0BUMEKKTWg-V1YF0BDe0AN1g?e=i7lyLt", "kmer_vocab.txt")
 get_sharepoint("https://pitt-my.sharepoint.com/:t:/g/personal/daa248_pitt_edu/EY_LoADXgS5CvrlY-4JtPnUBeKodPxIAWb2GUKUQbEy_Kg?e=FANqjc", "kinase_seqs.txt")
 
-# === Load model ===
+#  Load model 
 with open("model.pkl", "rb") as f:
     model = cloudpickle.load(f)
 
-# === Load vocabulary and sequence map ===
+#  Load vocabulary and sequence map 
 with open("kmer_vocab.txt") as f:
     vocab = [line.strip() for line in f]
 
@@ -53,7 +53,7 @@ with open("kinase_seqs.txt") as f:
             uniprot, seq = line.strip().split()
             seq_map[uniprot] = seq
 
-# === Featurization ===
+#  Featurization 
 def featurize(smile, uniprot):
     # Morgan fingerprint
     mol = Chem.MolFromSmiles(smile)
@@ -72,7 +72,7 @@ def featurize(smile, uniprot):
                 kmer_vec[kmer_to_index[kmer]] += 1
     return np.concatenate([fp_array, kmer_vec])
 
-# === Run predictions ===
+#  Run predictions 
 infile = open(sys.argv[1])
 outfile = open(sys.argv[2], "wt")
 

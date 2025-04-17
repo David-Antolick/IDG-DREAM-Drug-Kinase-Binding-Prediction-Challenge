@@ -73,9 +73,9 @@ from sklearn.model_selection import ParameterSampler
 from scipy.stats import randint, uniform
 
 param_grid = {
-    "max_depth": randint(6, 20),
-    "learning_rate": uniform(0.01, 0.5),
-    "num_boost_round": randint(50, 500),
+    "max_depth": randint(8, 14),
+    "learning_rate": uniform(0.04, 0.10),
+    "num_boost_round": randint(180, 380),
 }
 n_trials = 100
 samples = list(ParameterSampler(param_grid, n_iter=n_trials, random_state=42))

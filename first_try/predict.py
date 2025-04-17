@@ -39,10 +39,10 @@ def build_vocab(seqs, k):
     return sorted(kmers)
 
 if __name__ == "__main__":
-    test_path = "data/raw/indep.txt"
+    test_path = "data/raw/test1.txt"
     seqs_path = "data/raw/kinase_seqs.txt"
     model_path = "models/xgboost_model.pkl"
-    out_path = "data/predictions/indep_pred.txt"
+    out_path = "data/predictions/test1_pred.txt"
 
     k = 3
     ecfp_bits = 2048
