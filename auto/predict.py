@@ -53,8 +53,8 @@ def predict_on_dataset(model, test_path, out_path, sequences, vocab, k=3, ecfp_b
         valid_rows.append(row)
 
     X = np.array(X, dtype=np.float32)
-    dtest = X
-    preds = model.predict(np.array(X))
+    dtest = xgb.DMatrix(X)  
+    preds = model.predict(dtest)
 
     out_df = pd.DataFrame(valid_rows)
     out_df["pChEMBL"] = preds

@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import cloudpickle
-from train_catboost import train_catboost
+from train_xgboost import train_xgboost
 from predict import predict_on_dataset
 from eval import evaluate_predictions
 from featurize import featurize_training_set, load_uniprot_sequences, load_vocab, get_kmers
@@ -12,7 +12,7 @@ data_dir = "data"
 processed_dir = os.path.join(data_dir, "processed")
 raw_dir = os.path.join(data_dir, "raw")
 pred_dir = os.path.join(data_dir, "predictions")
-model_path = "models/catoost_model.pkl"
+model_path = "models/xgboost_model.pkl"
 vocab_path = os.path.join(processed_dir, "kmer_vocab.txt")
 
 #  Data Files 
@@ -36,7 +36,7 @@ else:
 
 #  Train initial model 
 print("\n>>> Training initial model...")
-result = train_catboost(x_path, y_path)
+result = train_xgboost(x_path, y_path)
 model = result["booster"]
 cloudpickle.dump(model, open(model_path, "wb"))
 
@@ -73,24 +73,24 @@ from skopt.space import Integer, Real
 from skopt.utils import use_named_args
 
 search_space = [
-    Integer(6, 16,   name="max_depth"),
-    Real   (0.005, .3, name="learning_rate"),
-    Integer(100, 800, name="num_boost_round"),
+    Integer(11, 20,   name="max_depth"),
+    Real   (0.13, .478, name="learning_rate"),
+    Integer(389, 1000, name="num_boost_round"),
 ]
 
-if not os.path.exists("data/logs.csv"):
+if not os.path.exists("data/logs_xgboost.csv"):
     pd.DataFrame(columns=[
         "trial", "max_depth", "learning_rate", "num_boost_round",
         "test1_spearman", "test2_spearman"
-    ]).to_csv("data/logs.csv", index=False)
+    ]).to_csv("data/logs_xgboost.csv", index=False)
 
 @use_named_args(search_space)
 def objective(**params):
     # trial counter from the CSV
-    trial_num = len(pd.read_csv("data/logs.csv")) + 1
+    trial_num = len(pd.read_csv("data/logs_xgboost.csv")) + 1
     print(f"\n>>> Trial {trial_num} with {params}")
 
-    result   = train_catboost(x_path, y_path, **params)
+    result   = train_xgboost(x_path, y_path, **params)
     test1_s, test2_s = score_model(result)
 
     # save best model
@@ -106,7 +106,7 @@ def objective(**params):
         **params,
         "test1_spearman": test1_s,
         "test2_spearman": test2_s
-    }]).to_csv("data/logs.csv", mode="a", header=False, index=False)
+    }]).to_csv("data/logs_xgboost.csv", mode="a", header=False, index=False)
 
     # minimise *negative* mean Spearman
     return -0.5 * (test1_s + test2_s)

@@ -3,7 +3,7 @@ import sys, urllib, re, requests, cloudpickle
 from rdkit import Chem
 from rdkit.Chem.rdFingerprintGenerator import GetMorganGenerator
 import numpy as np
-from catboost import CatBoostRegressor
+import xgboost as xgb
 import time
 
 start_time = time.time()
@@ -85,7 +85,7 @@ for line in infile:
     if x is None:
         val = 6.0  # fallback if invalid SMILES
     else:
-        val = float(model.predict(np.array([x]))[0])
+        val = float(model.predict(xgb.DMatrix(np.array([x])))[0])
     outfile.write(f"{smile} {uniprot} {val:.4f}\n")
 
 print('Time to run:', time.time() - start_time)
