@@ -53,8 +53,8 @@ def predict_on_dataset(model, test_path, out_path, sequences, vocab, k=3, ecfp_b
         valid_rows.append(row)
 
     X = np.array(X, dtype=np.float32)
-    dtest = xgb.DMatrix(X)
-    preds = model.predict(dtest)
+    dtest = X
+    preds = model.predict(np.array(X))
 
     out_df = pd.DataFrame(valid_rows)
     out_df["pChEMBL"] = preds
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     predict_on_dataset(
         test_path="data/raw/indep.txt",
         seqs_path="data/raw/kinase_seqs.txt",
-        model_path="models/xgboost_model.pkl",
+        model_path="models/catoost_model.pkl",
         vocab_path="models/kmer_vocab.txt",
         out_path="data/predictions/indep_pred.txt"
     )

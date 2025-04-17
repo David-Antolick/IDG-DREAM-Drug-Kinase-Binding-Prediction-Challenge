@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import cloudpickle
-from train_xgboost import train_xgboost
+from train_catboost import train_catboost
 from predict import predict_on_dataset
 from eval import evaluate_predictions
 from featurize import featurize_training_set, load_uniprot_sequences, load_vocab, get_kmers
@@ -12,7 +12,7 @@ data_dir = "data"
 processed_dir = os.path.join(data_dir, "processed")
 raw_dir = os.path.join(data_dir, "raw")
 pred_dir = os.path.join(data_dir, "predictions")
-model_path = "models/xgboost_model.pkl"
+model_path = "models/catoost_model.pkl"
 vocab_path = os.path.join(processed_dir, "kmer_vocab.txt")
 
 #  Data Files 
@@ -36,7 +36,7 @@ else:
 
 #  Train initial model 
 print("\n>>> Training initial model...")
-result = train_xgboost(x_path, y_path)
+result = train_catboost(x_path, y_path)
 model = result["booster"]
 cloudpickle.dump(model, open(model_path, "wb"))
 
@@ -86,7 +86,7 @@ if not os.path.exists('data/logs.csv'):
 
 for i, params in enumerate(samples):
     print(f"\n>>> Trial {i+1}/{n_trials} with {params}")
-    result = train_xgboost(x_path, y_path, **params)
+    result = train_catboost(x_path, y_path, **params)
     test1_s, test2_s = score_model(result)
 
 
