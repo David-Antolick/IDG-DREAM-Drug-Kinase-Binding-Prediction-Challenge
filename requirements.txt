@@ -14,3 +14,4 @@ mol2vec==0.2.2
 sgt==2.0.3
 cloudpickle==3.1.1
 tqdm
+catboost
