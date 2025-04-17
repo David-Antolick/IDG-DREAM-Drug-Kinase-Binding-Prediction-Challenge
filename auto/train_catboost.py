@@ -12,9 +12,9 @@ def train_catboost(
     y_path="data/processed/y_train.npy",
     model_path="models/catboost_model.pkl",
     test_size=0.1,
-    max_depth=15,
-    learning_rate=0.45164012945943416,
-    num_boost_round=397,
+    max_depth=6,
+    learning_rate=0.3,
+    num_boost_round=100,
     seed=42,
     verbose=True
 ):

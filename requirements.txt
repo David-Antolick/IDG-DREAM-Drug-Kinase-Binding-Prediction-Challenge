@@ -15,3 +15,4 @@ sgt==2.0.3
 cloudpickle==3.1.1
 tqdm
 catboost
+scikit-optimize

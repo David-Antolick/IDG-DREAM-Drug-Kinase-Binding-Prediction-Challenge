@@ -65,47 +65,58 @@ print(f"Baseline: test1 S={best_test1:.4f}, test2 S={best_test2:.4f}")
 
 
 
+### BAYSIAN OPTIMIZATION ###
 
 
+from skopt import gp_minimize
+from skopt.space import Integer, Real
+from skopt.utils import use_named_args
 
-#  Hyperparameter search 
-from sklearn.model_selection import ParameterSampler
-from scipy.stats import randint, uniform
+search_space = [
+    Integer(6, 16,   name="max_depth"),
+    Real   (0.005, .3, name="learning_rate"),
+    Integer(100, 800, name="num_boost_round"),
+]
 
-param_grid = {
-    "max_depth": randint(8, 14),
-    "learning_rate": uniform(0.04, 0.10),
-    "num_boost_round": randint(180, 380),
-}
-n_trials = 100
-samples = list(ParameterSampler(param_grid, n_iter=n_trials, random_state=42))
+if not os.path.exists("data/logs.csv"):
+    pd.DataFrame(columns=[
+        "trial", "max_depth", "learning_rate", "num_boost_round",
+        "test1_spearman", "test2_spearman"
+    ]).to_csv("data/logs.csv", index=False)
 
-if not os.path.exists('data/logs.csv'):
-    pd.DataFrame(columns=["trial", "max_depth", "learning_rate", "num_boost_round", "test1_spearman", "test2_spearman"]).to_csv('data/logs.csv', index=False)
+@use_named_args(search_space)
+def objective(**params):
+    # trial counter from the CSV
+    trial_num = len(pd.read_csv("data/logs.csv")) + 1
+    print(f"\n>>> Trial {trial_num} with {params}")
 
-
-for i, params in enumerate(samples):
-    print(f"\n>>> Trial {i+1}/{n_trials} with {params}")
-    result = train_catboost(x_path, y_path, **params)
+    result   = train_catboost(x_path, y_path, **params)
     test1_s, test2_s = score_model(result)
 
-
+    # save best model
+    global best_test1, best_test2
     if test1_s > best_test1 and test2_s > best_test2:
-        print("New best model! Saving...")
-        print('Spearman 1:', test1_s, '   Spearman 2:', test2_s)
+        print("New best! Spearman1:", test1_s, "Spearman2:", test2_s)
         cloudpickle.dump(result["booster"], open(model_path, "wb"))
         best_test1, best_test2 = test1_s, test2_s
 
-        # Append to CSV
-    trial_result = pd.DataFrame([{
-        "trial": i + 1,
-        "max_depth": params["max_depth"],
-        "learning_rate": params["learning_rate"],
-        "num_boost_round": params["num_boost_round"],
+    # log every trial
+    pd.DataFrame([{
+        "trial": trial_num,
+        **params,
         "test1_spearman": test1_s,
         "test2_spearman": test2_s
-    }])
-    trial_result.to_csv('data/logs.csv', mode="a", index=False, header=False)
+    }]).to_csv("data/logs.csv", mode="a", header=False, index=False)
 
+    # minimise *negative* mean Spearman
+    return -0.5 * (test1_s + test2_s)
 
-print(f"\nFinal best model: test1 S={best_test1:.4f}, test2 S={best_test2:.4f}")
+# 50 calls, 10 random start‑up points
+gp_minimize(
+    objective,
+    search_space,
+    n_calls=50,
+    n_initial_points=10,
+    random_state=42,
+    verbose=True
+)
