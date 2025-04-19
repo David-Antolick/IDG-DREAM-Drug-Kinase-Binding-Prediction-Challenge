@@ -6,19 +6,19 @@ GENERAL SETUP
 _____________
 
 [X] Create GitHub repo for this project
-[ ] Initialize Docker project (Dockerfile + requirements.txt)
-[ ] Confirm Docker container runs with base dependencies
+[X] Initialize Docker project (Dockerfile + requirements.txt)
+[X] Confirm Docker container runs with base dependencies
 
 
 DATA DOWNLOADS
 ______________
 
-[ ] Download `chembl_activities.txt.gz` (provided by instructor)
-[ ] Download `chembl_33_chemreps.txt.gz`
-[ ] Download `test1.txt`, `test2.txt`, `indep.txt`
-[ ] Download `test1_labels.txt`, `test2_labels.txt` (for validation only!)
-[ ] Download `test_kinase_seqs.txt`
-[ ] Download `kinase_seqs.txt`
+[X] Download `chembl_activities.txt.gz` (provided by instructor)
+[X] Download `chembl_33_chemreps.txt.gz`
+[X] Download `test1.txt`, `test2.txt`, `indep.txt`
+[X] Download `test1_labels.txt`, `test2_labels.txt` (for validation only!)
+[X] Download `test_kinase_seqs.txt`
+[X] Download `kinase_seqs.txt`
 [ ] Download UniProt <-> ChEMBL mapping file (or extract from paper/links)
 
 
