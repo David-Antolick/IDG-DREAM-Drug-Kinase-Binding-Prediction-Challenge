@@ -83,3 +83,60 @@ best_test1, best_test2 = score_model(result)
 print(f"Baseline: test1 S={best_test1:.4f}, test2 S={best_test2:.4f}")
 
 
+
+
+### BAYSIAN OPTIMIZATION ###
+
+
+from skopt import gp_minimize
+from skopt.space import Integer, Real
+from skopt.utils import use_named_args
+
+search_space = [
+    Integer(11, 20,   name="max_depth"),
+    Real   (0.13, .478, name="learning_rate"),
+    Integer(389, 1000, name="num_boost_round"),
+]
+
+if not os.path.exists("data/logs_xgboost.csv"):
+    pd.DataFrame(columns=[
+        "trial", "max_depth", "learning_rate", "num_boost_round",
+        "test1_spearman", "test2_spearman"
+    ]).to_csv("data/logs_xgboost.csv", index=False)
+
+@use_named_args(search_space)
+def objective(**params):
+    # trial counter from the CSV
+    trial_num = len(pd.read_csv("data/logs_xgboost.csv")) + 1
+    print(f"\n>>> Trial {trial_num} with {params}")
+
+    result   = train_xgboost(x_path, y_path, **params)
+    test1_s, test2_s = score_model(result)
+
+    # save best model
+    global best_test1, best_test2
+    if test1_s > best_test1 and test2_s > best_test2:
+        print("New best! Spearman1:", test1_s, "Spearman2:", test2_s)
+        cloudpickle.dump(result["booster"], open(model_path, "wb"))
+        best_test1, best_test2 = test1_s, test2_s
+
+    # log every trial
+    pd.DataFrame([{
+        "trial": trial_num,
+        **params,
+        "test1_spearman": test1_s,
+        "test2_spearman": test2_s
+    }]).to_csv("data/logs_xgboost.csv", mode="a", header=False, index=False)
+
+    # minimise *negative* mean Spearman
+    return -0.5 * (test1_s + test2_s)
+
+# 50 calls, 10 random start‑up points
+gp_minimize(
+    objective,
+    search_space,
+    n_calls=50,
+    n_initial_points=10,
+    random_state=42,
+    verbose=True
+)
