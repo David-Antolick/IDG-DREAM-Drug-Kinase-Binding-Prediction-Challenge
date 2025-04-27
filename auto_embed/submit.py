@@ -8,9 +8,8 @@ import time
 
 start_time = time.time()
 
-#  Download Helper 
+# Download helper
 def get_sharepoint(url, fname):
-    '''Fetch a world-readable SharePoint file shared via URL'''
     s = requests.Session()
     r = s.get(url)
     if not r:
@@ -30,22 +29,16 @@ def get_sharepoint(url, fname):
             fd.write(chunk)
     return True
 
-#  Download all files 
-get_sharepoint("https://pitt-my.sharepoint.com/:u:/g/personal/daa248_pitt_edu/EXax2uFOUN9Cqdc1RLIGLUMBr4M_RsN5IaAJZLC0KBmt9w?e=3lIlzG", "model.pkl")
-get_sharepoint("https://pitt-my.sharepoint.com/:t:/g/personal/daa248_pitt_edu/EdUlcAZ2gdFGnrqTCCUrQY0BUMEKKTWg-V1YF0BDe0AN1g?e=i7lyLt", "kmer_vocab.txt")
+# Download required files
+get_sharepoint("https://pitt-my.sharepoint.com/:u:/g/personal/daa248_pitt_edu/EfCZ-V2GcCVNp6L8Vms9DzoB-Ny2O-ldBVwzvk1X9sR84A?e=VQWaxY", "model.pkl")
 get_sharepoint("https://pitt-my.sharepoint.com/:t:/g/personal/daa248_pitt_edu/EY_LoADXgS5CvrlY-4JtPnUBeKodPxIAWb2GUKUQbEy_Kg?e=FANqjc", "kinase_seqs.txt")
+get_sharepoint("https://pitt-my.sharepoint.com/:u:/g/personal/daa248_pitt_edu/EbgpSLAyFAhEmaPEabv26_0Bfne6Ts287b-kc0ctlDuHhw?e=bUkCxH", "esm2_embeddings.npy")
 
-#  Load model 
+# Load model
 with open("model.pkl", "rb") as f:
     model = cloudpickle.load(f)
 
-#  Load vocabulary and sequence map 
-with open("kmer_vocab.txt") as f:
-    vocab = [line.strip() for line in f]
-
-kmer_to_index = {kmer: i for i, kmer in enumerate(vocab)}
-k = len(vocab[0])
-
+# Load sequences
 seq_map = {}
 with open("kinase_seqs.txt") as f:
     for line in f:
@@ -53,26 +46,24 @@ with open("kinase_seqs.txt") as f:
             uniprot, seq = line.strip().split()
             seq_map[uniprot] = seq
 
-#  Featurization 
+# Load ESM-2 embeddings
+embedding_dict = np.load("esm2_embeddings.npy", allow_pickle=True).item()
+
+# Featurize: ECFP + ESM embedding
 def featurize(smile, uniprot):
-    # Morgan fingerprint
     mol = Chem.MolFromSmiles(smile)
     if mol is None:
         return None
     fp = GetMorganGenerator(radius=2, fpSize=2048)
-    fp_array = np.array(fp.GetFingerprint(mol), dtype=np.float32)
+    ecfp_vec = np.array(fp.GetFingerprint(mol), dtype=np.float32)
 
-    # K-mer count
-    kmer_vec = np.zeros(len(kmer_to_index))
-    seq = seq_map.get(uniprot)
-    if seq:
-        for i in range(len(seq) - k + 1):
-            kmer = seq[i:i+k]
-            if kmer in kmer_to_index:
-                kmer_vec[kmer_to_index[kmer]] += 1
-    return np.concatenate([fp_array, kmer_vec])
+    if uniprot not in embedding_dict:
+        return None
+    esm_vec = embedding_dict[uniprot]
 
-#  Run predictions 
+    return np.concatenate([ecfp_vec, esm_vec])
+
+# Run predictions
 infile = open(sys.argv[1])
 outfile = open(sys.argv[2], "wt")
 
@@ -83,7 +74,7 @@ for line in infile:
     smile, uniprot = line.strip().split()
     x = featurize(smile, uniprot)
     if x is None:
-        val = 6.0  # fallback if invalid SMILES
+        val = 6.0
     else:
         val = float(model.predict(xgb.DMatrix(np.array([x])))[0])
     outfile.write(f"{smile} {uniprot} {val:.4f}\n")

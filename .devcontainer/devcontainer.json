@@ -13,7 +13,8 @@
 	// "features": {},
 	"runArgs": [
 		"--gpus",
-		"all"
+		"all",
+		"--ipc=host"
 	],
 	
 	"mounts": [

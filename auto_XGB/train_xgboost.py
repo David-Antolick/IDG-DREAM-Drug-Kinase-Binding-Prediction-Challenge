@@ -13,9 +13,9 @@ def train_xgboost(
     y_path="data/processed/y_train.npy",
     model_path="models/xgboost_model.pkl",
     test_size=0.1,
-    max_depth=6,
-    learning_rate=0.1,
-    num_boost_round=300,
+    max_depth=15,
+    learning_rate=0.45164012945943416,
+    num_boost_round=397,
     seed=42,
     verbose=True
 ):

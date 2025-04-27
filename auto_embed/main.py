@@ -93,21 +93,29 @@ from skopt.space import Integer, Real
 from skopt.utils import use_named_args
 
 search_space = [
-    Integer(11, 20,   name="max_depth"),
-    Real   (0.13, .478, name="learning_rate"),
-    Integer(389, 1000, name="num_boost_round"),
+    Integer(5, 10,   name="max_depth"),
+    Real(0.13, 0.478, name="learning_rate"),
+    Integer(300, 700, name="num_boost_round"),
+    Integer(1, 10,    name="min_child_weight"),
+    Real(0.5, 1.0,    name="subsample"),
+    Real(0.5, 1.0,    name="colsample_bytree"),
+    Real(0.0, 5.0,    name="gamma"),
+    Real(0.0, 1.0,    name="reg_alpha"),
+    Real(0.0, 1.0,    name="reg_lambda"),
 ]
 
-if not os.path.exists("data/logs_xgboost.csv"):
+if not os.path.exists("data/logs_xgboost_more.csv"):
     pd.DataFrame(columns=[
         "trial", "max_depth", "learning_rate", "num_boost_round",
+        "min_child_weight", "subsample", "colsample_bytree",
+        "gamma", "reg_alpha", "reg_lambda",
         "test1_spearman", "test2_spearman"
-    ]).to_csv("data/logs_xgboost.csv", index=False)
+    ]).to_csv("data/logs_xgboost_more.csv", index=False)
 
 @use_named_args(search_space)
 def objective(**params):
     # trial counter from the CSV
-    trial_num = len(pd.read_csv("data/logs_xgboost.csv")) + 1
+    trial_num = len(pd.read_csv("data/logs_xgboost_more.csv")) + 1
     print(f"\n>>> Trial {trial_num} with {params}")
 
     result   = train_xgboost(x_path, y_path, **params)
@@ -126,7 +134,7 @@ def objective(**params):
         **params,
         "test1_spearman": test1_s,
         "test2_spearman": test2_s
-    }]).to_csv("data/logs_xgboost.csv", mode="a", header=False, index=False)
+    }]).to_csv("data/logs_xgboost_more.csv", mode="a", header=False, index=False)
 
     # minimise *negative* mean Spearman
     return -0.5 * (test1_s + test2_s)
