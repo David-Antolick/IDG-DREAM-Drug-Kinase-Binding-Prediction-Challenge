@@ -28,9 +28,6 @@ test_inputs = [os.path.join(raw_dir, f"{name}.txt") for name in test_files]
 test_labels = [os.path.join(raw_dir, f"{name}_labels.txt") for name in test_files]
 test_preds = [os.path.join(pred_dir, f"{name}_pred.txt") for name in test_files]
 
-x_path = "data/processed/X_train.npy"
-y_path = "data/processed/y_train.npy"
-
 llm_tag = "_llm" if use_llm else ""
 x_path = f"data/processed/X_train{llm_tag}.npy"
 y_path = f"data/processed/y_train{llm_tag}.npy"
@@ -93,9 +90,9 @@ from skopt.space import Integer, Real
 from skopt.utils import use_named_args
 
 search_space = [
-    Integer(5, 10,   name="max_depth"),
-    Real(0.13, 0.478, name="learning_rate"),
-    Integer(300, 700, name="num_boost_round"),
+    Integer(9, 9,   name="max_depth"),
+    Real(0.25, 0.33, name="learning_rate"),
+    Integer(650, 700, name="num_boost_round"),
     Integer(1, 10,    name="min_child_weight"),
     Real(0.5, 1.0,    name="subsample"),
     Real(0.5, 1.0,    name="colsample_bytree"),
@@ -110,7 +107,7 @@ if not os.path.exists("data/logs_xgboost_more.csv"):
         "min_child_weight", "subsample", "colsample_bytree",
         "gamma", "reg_alpha", "reg_lambda",
         "test1_spearman", "test2_spearman"
-    ]).to_csv("data/logs_xgboost_more.csv", index=False)
+    ]).to_csv("data/logs_xgboost_embeddings.csv", index=False)
 
 @use_named_args(search_space)
 def objective(**params):

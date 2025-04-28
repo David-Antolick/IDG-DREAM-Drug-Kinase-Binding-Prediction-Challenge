@@ -13,11 +13,17 @@ def train_xgboost(
     y_path="data/processed/y_train.npy",
     model_path="models/xgboost_model.pkl",
     test_size=0.1,
-    max_depth=15,
-    learning_rate=0.45164012945943416,
-    num_boost_round=397,
+    max_depth=9,
+    learning_rate=0.2796133227174733,
+    num_boost_round=698,
     seed=42,
-    verbose=True
+    verbose=True,
+    min_child_weight=1,
+    subsample=1.0,
+    colsample_bytree=1.0,
+    gamma=0.0,
+    reg_alpha=0.0,
+    reg_lambda=1.0
 ):
     x = np.load(x_path)
     y = np.load(y_path)
@@ -35,7 +41,13 @@ def train_xgboost(
         "tree_method": "hist",
         "device": "cuda",
         "max_depth": max_depth,
-        "eta": learning_rate
+        "eta": learning_rate,
+        "min_child_weight": min_child_weight,
+        "subsample": subsample,
+        "colsample_bytree": colsample_bytree,
+        "gamma": gamma,
+        "reg_alpha": reg_alpha,
+        "reg_lambda": reg_lambda
     }
 
     class TQDMCallback(xgb.callback.TrainingCallback):

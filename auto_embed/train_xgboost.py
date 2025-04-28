@@ -24,7 +24,8 @@ def train_xgboost(
     gamma=0.0,
     reg_alpha=0.0,
     reg_lambda=1.0
-):
+    ):
+
 
     x = np.load(x_path)
     y = np.load(y_path)
@@ -37,18 +38,18 @@ def train_xgboost(
     dvalid = xgb.DMatrix(x_val, label=y_val)
 
     params = {
-        "objective": "reg:squarederror",
-        "eval_metric": "rmse",
-        "tree_method": "hist",
-        "device": "cuda",
-        "max_depth": max_depth,
-        "eta": learning_rate,
-        "min_child_weight": min_child_weight,
-        "subsample": subsample,
-        "colsample_bytree": colsample_bytree,
-        "gamma": gamma,
-        "reg_alpha": reg_alpha,
-        "reg_lambda": reg_lambda
+    "objective": "reg:squarederror",
+    "eval_metric": "rmse",
+    "tree_method": "hist",
+    "device": "cuda",
+    "max_depth": max_depth,
+    "eta": learning_rate,
+    "min_child_weight": min_child_weight,
+    "subsample": subsample,
+    "colsample_bytree": colsample_bytree,
+    "gamma": gamma,
+    "reg_alpha": reg_alpha,
+    "reg_lambda": reg_lambda
     }
 
 
