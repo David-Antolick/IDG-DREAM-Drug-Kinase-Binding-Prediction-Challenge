@@ -90,14 +90,14 @@ from skopt.space import Integer, Real
 from skopt.utils import use_named_args
 
 search_space = [
-    Integer(9, 9,   name="max_depth"),
-    Real(0.25, 0.33, name="learning_rate"),
-    Integer(650, 700, name="num_boost_round"),
-    Integer(1, 10,    name="min_child_weight"),
-    Real(0.5, 1.0,    name="subsample"),
+    Integer(8, 10,   name="max_depth"),
+    Real(0.2, 0.35, name="learning_rate"),
+    Integer(650, 750, name="num_boost_round"),
+    Integer(1, 9,    name="min_child_weight"),
+    Real(0.7, 1.0,    name="subsample"),
     Real(0.5, 1.0,    name="colsample_bytree"),
-    Real(0.0, 5.0,    name="gamma"),
-    Real(0.0, 1.0,    name="reg_alpha"),
+    Real(0.0, 2.5,    name="gamma"),
+    Real(0.0, 0.8,    name="reg_alpha"),
     Real(0.0, 1.0,    name="reg_lambda"),
 ]
 
