@@ -30,7 +30,7 @@ def get_sharepoint(url, fname):
     return True
 
 # Download required files
-get_sharepoint("https://pitt-my.sharepoint.com/:u:/g/personal/daa248_pitt_edu/EfCZ-V2GcCVNp6L8Vms9DzoB-Ny2O-ldBVwzvk1X9sR84A?e=VQWaxY", "model.pkl")
+get_sharepoint("https://pitt-my.sharepoint.com/:u:/g/personal/daa248_pitt_edu/EfCZ-V2GcCVNp6L8Vms9DzoB-Ny2O-ldBVwzvk1X9sR84A?e=plVFd6", "model.pkl")
 get_sharepoint("https://pitt-my.sharepoint.com/:t:/g/personal/daa248_pitt_edu/EY_LoADXgS5CvrlY-4JtPnUBeKodPxIAWb2GUKUQbEy_Kg?e=FANqjc", "kinase_seqs.txt")
 get_sharepoint("https://pitt-my.sharepoint.com/:u:/g/personal/daa248_pitt_edu/EbgpSLAyFAhEmaPEabv26_0Bfne6Ts287b-kc0ctlDuHhw?e=bUkCxH", "esm2_embeddings.npy")
 

@@ -101,18 +101,18 @@ search_space = [
     Real(0.0, 1.0,    name="reg_lambda"),
 ]
 
-if not os.path.exists("data/logs_xgboost_more.csv"):
+if not os.path.exists("data/logs_xgboost_embed.csv"):
     pd.DataFrame(columns=[
         "trial", "max_depth", "learning_rate", "num_boost_round",
         "min_child_weight", "subsample", "colsample_bytree",
         "gamma", "reg_alpha", "reg_lambda",
         "test1_spearman", "test2_spearman"
-    ]).to_csv("data/logs_xgboost_embeddings.csv", index=False)
+    ]).to_csv("data/logs_xgboost_embed.csv", index=False)
 
 @use_named_args(search_space)
 def objective(**params):
     # trial counter from the CSV
-    trial_num = len(pd.read_csv("data/logs_xgboost_more.csv")) + 1
+    trial_num = len(pd.read_csv("data/logs_xgboost_embed.csv")) + 1
     print(f"\n>>> Trial {trial_num} with {params}")
 
     result   = train_xgboost(x_path, y_path, **params)
@@ -131,7 +131,7 @@ def objective(**params):
         **params,
         "test1_spearman": test1_s,
         "test2_spearman": test2_s
-    }]).to_csv("data/logs_xgboost_more.csv", mode="a", header=False, index=False)
+    }]).to_csv("data/logs_xgboost_embed.csv", mode="a", header=False, index=False)
 
     # minimise *negative* mean Spearman
     return -0.5 * (test1_s + test2_s)

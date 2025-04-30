@@ -13,17 +13,17 @@ def train_xgboost(
     y_path="data/processed/y_train.npy",
     model_path="models/xgboost_model.pkl",
     test_size=0.1,
-    max_depth=10,
-    learning_rate=0.35,
-    num_boost_round=750,
+    max_depth=8,
+    learning_rate=0.2643490817838027,
+    num_boost_round=731,
     seed=42,
     verbose=True,
-    min_child_weight=9,
-    subsample=1.0,
-    colsample_bytree=1.0,
-    gamma=2.5,
-    reg_alpha=0.8,
-    reg_lambda=1.0
+    min_child_weight=1,
+    subsample=0.8841882802080611,
+    colsample_bytree=0.7584749940505557,
+    gamma=0.3451605004799716,
+    reg_alpha=0.45731332516836115,
+    reg_lambda=0.3078722932672262
     ):
 
 
