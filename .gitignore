@@ -13,6 +13,7 @@ test.py
 *.npy
 models/
 data/
+plots/
 
 
 # OS files
