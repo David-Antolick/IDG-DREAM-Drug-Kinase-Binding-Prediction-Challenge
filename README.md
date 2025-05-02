@@ -17,7 +17,6 @@ This repository contains a modular pipeline for predicting kinase inhibitor bind
 
 ## 📁 Project Structure
 
-.
 ├── .devcontainer/         # VS Code dev container config  
 ├── auto_embed/            # Final modularized pipeline using ESM2 protein embeddings  
 │   ├── esm_embed.py  
