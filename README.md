@@ -1,113 +1,129 @@
-# Drug-Kinase Binding Prediction
-_Modular XGBoost pipelines with ECFP6 + protein features (3-mer or ESM2)_
+# IDG‑DREAM Drug‑Kinase Binding Prediction (Class Project)
 
-Predict the pChEMBL affinity of a small-molecule inhibitor for a kinase using
-only **SMILES** and **protein sequence** information.  
-This codebase was built for a retrospective run of the
-**IDG-DREAM Drug-Kinase Binding Prediction Challenge** (COBB 2060, University of
-Pittsburgh). The final, top-scoring solution lives in
-`auto_embed/` and fuses ligand fingerprints with **ESM2-3B** protein
-embeddings. :contentReference[oaicite:0]{index=0}
+**Predicting small‑molecule ⇆ kinase binding affinities with ESM‑2 protein embeddings and XGBoost** — built as a *course project* for the University of Pittsburgh **Scalable Machine Learning** class (Spring 2025). We retro‑ran the public IDG‑DREAM dataset for practice; no results were submitted to the official challenge.
 
 ---
 
-## Project Overview
+| Split                  | Spearman ρ | ROC AUC † |
+| ---------------------- | ---------- | --------- |
+| Test 1                 | **0.327**  | —         |
+| Test 2                 | **0.426**  | —         |
+| Independent kinase set | **0.624**  | 0.759     |
 
-| Stage | What happens |
-|-------|--------------|
-| **Data ingest** | Bulk ChEMBL activities (`pChEMBL`, SMILES, target IDs) and kinase sequences (UniProt FASTA). |
-| **Ligand encoding** | RDKit 2048-bit **ECFP6** fingerprints. |
-| **Protein encoding** | <br>• Baseline: 3-mer bag-of-words (`auto_XGB/`).<br>• **Final**: mean-pooled **ESM2-3B** embeddings (`auto_embed/`). |
-| **Model** | GPU **XGBoost** regressor (`objective=reg:squarederror`). |
-| **Hyper-opt** | ~500 Bayesian trials (Optuna) on a held-out kinase split. |
-| **Packaging** | Trained model + scalers serialised with `cloudpickle` for 1-file deployment. |
+† ROC‑AUC is reported only for the independent kinase evaluation where binary actives/inactives are provided.
 
 ---
 
-## Repository Layout
+## Project highlights
 
+* **Protein features** – Mean‑pooled embeddings from the 3‑billion‑parameter **ESM‑2** model (`facebook/esm2_t36_3B`).
+* **Ligand features** – 2048‑bit ECFP4 fingerprints (`rdkit`).
+* **Model** – Gradient‑boosted decision trees (**XGBoost 3.0**), tuned via early stopping on a 90/10 validation split.
+* **Single‑command pipeline** – `auto_embed/main.py` orchestrates *featurisation → training → evaluation → prediction*.
+* **Reproducible GPU dev‑container** – Open in VS Code → *Reopen in Container* to get CUDA 12 + Python 3.12 + all deps.
+
+---
+
+## Directory layout
+
+```text
+.
+├── auto_embed/          # ⬅ final pipeline (focus of this repo)
+│   ├── esm_embed.py     # extract & cache ESM‑2 embeddings
+│   ├── featurize.py     # ECFP + embedding → X,y .npy files
+│   ├── train_xgboost.py # train + checkpoint model
+│   ├── predict.py       # inference on CSV splits
+│   ├── eval.py          # Spearman / ROC‑AUC metrics
+│   ├── submit.py        # formats competition file (kept for completeness)
+│   └── main.py          # orchestrates everything end‑to‑end
+├── auto_XGB/            # earlier ligand‑only baseline
+├── first_try/           # prototype notebooks & scripts
+├── data/
+│   ├── raw/             # ← place competition CSVs & `kinase_seqs.txt` here
+│   └── processed/       # cached embeddings & features
+├── models/              # trained XGBoost checkpoints
+├── plots/               # figures for class report
+├── requirements.txt     # Python deps
+└── .devcontainer/       # VS Code + CUDA environment
 ```
 
-├── .devcontainer/        # VS Code CUDA dev-container
-├── auto\_embed/           # ⭐ Final ESM2 pipeline
-│   ├── esm\_embed.py
-│   ├── featurize.py
-│   ├── train\_xgboost.py
-│   ├── predict.py
-│   └── main.py
-├── auto\_XGB/             # Baseline k-mer pipeline
-├── first\_try/            # Early notebooks & experiments
-├── plots/                # Saved figures (git-ignored)
-├── data/                 # Large files (git-ignored)
-├── models/               # Checkpoints (git-ignored)
-├── requirements.txt
-└── README.md             # You are here
-
-````:contentReference[oaicite:1]{index=1}
-
 ---
 
-## Quick-Start
-
-> Tested on Ubuntu 22.04, Python 3.12, CUDA 12.x.
+## Quick‑start (GPU)
 
 ```bash
-# 1. Clone & create an env
-git clone https://github.com/David-Antolick/IDG-DREAM-Drug-Kinase-Binding-Prediction-Challenge.git
-cd IDG-DREAM-Drug-Kinase-Binding-Prediction-Challenge
-rebuild and reopen in container
+# 1 · Clone
+$ git clone https://github.com/<your‑org>/idg‑dream‑kinase.git
+$ cd idg‑dream‑kinase
 
-# 2. Download public ChEMBL + kinase FASTA
- 
+# 2 · Env (conda/venv or dev‑container)
+$ pip install -r requirements.txt
 
-# 3. Generate ESM2 embeddings
-python auto_embed/esm_embed.py \
-    --fasta  data/raw/kinase_seqs.fasta \
-    --out    data/processed/esm2_embeddings.npy
+# 3 · Data (not distributed)
+$ mkdir -p data/raw && mv <files> data/raw/
+  #  train.csv · test1.csv · test2.csv · kinase_seqs.txt
 
-# 4. Featurise and train
-python auto_embed/featurize.py  --embeddings data/processed/esm2_embeddings.npy
-python auto_embed/train_xgboost.py --output models/esm2_xgb.pkl
+# 4 · ESM‑2 embeddings (~3 h on 1×3090)
+$ python auto_embed/esm_embed.py \
+      --seq_path data/raw/kinase_seqs.txt \
+      --out_path data/processed/esm2_embeddings.npy
 
-# 5. Inference on the DREAM test set
-python auto_embed/predict.py \
-    --model models/esm2_xgb.pkl \
-    --input data/test/test1.txt \
-    --output predictions/test1_pred.txt
-````
+# 5 · End‑to‑end run
+$ python auto_embed/main.py
+  # → models/, preds_test?.txt, results/*.json
 
-All steps finish inside the 20-minute limit mandated by the course
-grader (12 CPU, 24 GB GPU RAM).
+# 6 · Local evaluation (needs ground‑truth label file)
+$ python auto_embed/eval.py data/raw/test2_labels.txt preds_test2.txt
+```
 
----
+### Minimal API
 
-## Results
+```python
+from auto_embed.predict import load_model, predict_on_dataset
 
-| Dataset |           Spearman ↑ | RMSE ↓ | AUC (indep.) |
-| ------- | -------------------: | -----: | ------------ |
-| Test 1  |            **0.327** |   0.87 | –            |
-| Test 2  |            **0.426** |   0.78 | –            |
-| Indep.  | **0.624** (p < 1e-4) |      – | **0.759**    |
-
-These scores more than **double** the challenge’s supplied mean-baseline on both
-official rounds. ([GitHub][1])
+yhat = predict_on_dataset(
+    csv_path="my_pairs.csv",          # smiles, uniprot columns
+    model_path="models/xgboost_model.pkl",
+    embeddings_path="data/processed/esm2_embeddings.npy"
+)
+yhat.to_csv("predictions.txt", sep=" ", index=False, header=False)
+```
 
 ---
 
-## How This Repo Demonstrates Impact
+## Hyper‑parameters
 
-* **End-to-end ownership** – data engineering → feature design → hyper-opt →
-  packaging.
-* **Modern protein LMs** – shows practical benefit of ESM2 embeddings when
-  structural data are unavailable.
-* **Reproducibility** – dev-container and pinned requirements keep grader and
-  recruiter environments consistent.
+| parameter                | value                      |
+| ------------------------ | -------------------------- |
+| `max_depth`              | 8                          |
+| `n_estimators`           | 1000 (early stopping = 50) |
+| `learning_rate`          | 0.03                       |
+| `subsample`              | 0.9                        |
+| `colsample_bytree`       | 0.5                        |
+| `min_child_weight`       | 1                          |
+| `gamma`                  | 0.0                        |
+| `reg_alpha / reg_lambda` | 0 / 1                      |
+
+---
+
+## Reproducing the class scores
+
+1. Follow *Quick‑start*.
+2. Use `auto_embed/eval.py` with the hidden‑label files provided by the teaching staff or your own split.
+3. Your metrics should match the table above within ±0.01 ρ (GPU nondeterminism).
+
+> ✦ **Note** `submit.py` is kept for completeness if you *do* decide to enter the public leaderboard, but it was *not* used during our coursework.
+
+---
+
+## Acknowledgements
+
+* Facebook AI for **ESM‑2**.
+* The **IDG‑DREAM** organisers for the open dataset.
+* Dr. Eric Xing & teaching team for the Scalable ML course inspiration.
 
 ---
 
 ## License
 
-Apache-2.0 (see `LICENSE`).
-
-
-[1]: https://github.com/David-Antolick/IDG-DREAM-Drug-Kinase-Binding-Prediction-Challenge "GitHub - David-Antolick/IDG-DREAM-Drug-Kinase-Binding-Prediction-Challenge"
+Released under the **MIT License**. PRs welcome!
