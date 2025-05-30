@@ -120,7 +120,7 @@ yhat.to_csv("predictions.txt", sep=" ", index=False, header=False)
 
 * Facebook AI for **ESM‑2**.
 * The **IDG‑DREAM** organisers for the open dataset.
-* Dr. Eric Xing & teaching team for the Scalable ML course inspiration.
+* Dr. David Koes & teaching team for the Scalable ML course inspiration.
 
 ---
 
