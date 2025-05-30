@@ -112,7 +112,7 @@ yhat.to_csv("predictions.txt", sep=" ", index=False, header=False)
 2. Use `auto_embed/eval.py` with the hidden‑label files provided by the teaching staff or your own split.
 3. Your metrics should match the table above within ±0.01 ρ (GPU nondeterminism).
 
-> ✦ **Note** `submit.py` is kept for completeness if you *do* decide to enter the public leaderboard, but it was *not* used during our coursework.
+> ✦ **Note** `submit.py` is kept for completeness as it was submitted to a local class webpage. As you likely dont have access to this, please ignore.
 
 ---
 
