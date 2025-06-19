@@ -76,21 +76,6 @@ $ python auto_embed/main.py
 $ python auto_embed/eval.py data/raw/test2_labels.txt preds_test2.txt
 ```
 
-### Minimal API
-
-```python
-from auto_embed.predict import load_model, predict_on_dataset
-
-yhat = predict_on_dataset(
-    csv_path="my_pairs.csv",          # smiles, uniprot columns
-    model_path="models/xgboost_model.pkl",
-    embeddings_path="data/processed/esm2_embeddings.npy"
-)
-yhat.to_csv("predictions.txt", sep=" ", index=False, header=False)
-```
-
----
-
 ## Hyper‑parameters
 
 | parameter                | value                      |
